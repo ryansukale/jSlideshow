@@ -1,0 +1,16 @@
+.left-slider-control{
+	background-color:#e0e0e0;
+	position:relative;
+	float:left;
+	text-align:center;
+	font-weight:bolder;
+}
+
+.right-slider-control{
+	float:right;
+	font-weight:bolder;
+	text-align:center;
+	background-color:#e0e0e0;
+	position:relative;
+	overflow:auto;
+}
