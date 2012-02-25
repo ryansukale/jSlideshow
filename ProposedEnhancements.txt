@@ -1,0 +1,2 @@
+Changing the size of the next and previous indicators that appear on the slideshow.
+Adding a "mode" parameter. This would let the user choose among different slideshow modes such as - normal/lightbox.

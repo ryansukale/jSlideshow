@@ -1,7 +1,7 @@
 /**
 widget.slideshow.js
 Version 	: 	1.0
-Features 	: 	Horizontal Sliding				
+Features 	: 	Horizontal Sliding
 */
 (function($){
 	var slideshowPrototype={
@@ -80,8 +80,8 @@ Features 	: 	Horizontal Sliding
 			$prevControl.css({'opacity':'0.1'});
 			$nextControl.css({'opacity':'0.1'});
 			
-			$prevControl.append('<div>'+'<'+'</div>');
-			$nextControl.append('<div>'+'>'+'</div>');
+			$prevControl.append('<div>'+''+'</div>');
+			$nextControl.append('<div>'+''+'</div>');
 			
 			if(!options.cyclic){
 				$prevControl.hide();
@@ -113,10 +113,12 @@ Features 	: 	Horizontal Sliding
 				$nextControl.addClass('right-slider-control').width(options.slideControlWidth);
 				
 				//Calculate the heights of the sliding controls based upon the height of the slides
-				$prevControl.css('top',-slidesHeight);
-				$prevControl.css('height',slidesHeight);
-				$nextControl.css('top',-slidesHeight);
-				$nextControl.css('height',slidesHeight);
+				$prevControl.css('top',-(slidesHeight-20));
+				//$prevControl.css('height',slidesHeight);
+				$nextControl.css('top',-(slidesHeight-20));
+				//$nextControl.css('height',slidesHeight);
+				//$prevControl.addClass('');
+				//$nextControl.addClass('');
 				
 				//Vertically align the text of the controllers
 				$('div',$nextControl).css('padding-top',$nextControl.height()/2.3);
