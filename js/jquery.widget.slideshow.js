@@ -8,8 +8,10 @@ Features 	: 	Horizontal Sliding
 		options:{
 			slidesSelector:'',
 			slideAxis:'x',
-			slideControlWidth:30,
-			cyclic:false
+			cycle:false,
+			url:'',
+			width:'300px', //The default width of the box
+			height:'300px' //The default height of the box
 		},
 		_create:function(){
 			console.log('create');
@@ -33,23 +35,45 @@ Features 	: 	Horizontal Sliding
 			}
 			
 			
-			//Wrap all the slides inside a div, and also create divs for the 
-			//'prev' and 'next' controllers
-			$domObject.wrapInner('<div></div>').append('<div></div>').append('<div></div>');
-			var $prevControl=$domObject.children().eq(1);
-			var $nextControl=$domObject.children().eq(2);
-			
 			$domObject.data('currentSlide',0);
 			
-			//Perform the visual setup of the elements based upon the widget's options
-			//for the layout of the widget.
-			this._visualSetup($domObject,options);
-			
-			//Initialize the slideshow controllers
-			this._navigationSetup($domObject,options);
+			//If the images are to be fetched asynchronously, fetch the data then proceed to widget creation.
+			if(options.url){
+				$.when(this._getUrlSource()).then(function(){
+					//Wrap all the slides inside a div, and also create divs for the 
+					//'prev' and 'next' controllers
+					$domObject.wrapInner('<div></div>').append('<div></div>').append('<div></div>');
+					var $prevControl=$domObject.children().eq(1);
+					var $nextControl=$domObject.children().eq(2);
+					
+					//Perform the visual setup of the elements based upon the widget's options
+					//for the layout of the widget.
+					widget._visualSetup($domObject,options);
+					
+					//Initialize the slideshow controllers
+					widget._navigationSetup($domObject,options);
+				});
+			}
+			else{
+				//Wrap all the slides inside a div, and also create divs for the 
+				//'prev' and 'next' controllers
+				$domObject.wrapInner('<div></div>').append('<div></div>').append('<div></div>');
+				var $prevControl=$domObject.children().eq(1);
+				var $nextControl=$domObject.children().eq(2);	
+				
+				//Perform the visual setup of the elements based upon the widget's options
+				//for the layout of the widget.
+				widget._visualSetup($domObject,options);
+				
+				//Initialize the slideshow controllers
+				widget._navigationSetup($domObject,options);
+			}
 		},
 		_visualSetup:function($domObject,options){
 		
+			//If a url is declared, then use it as the source for the images.
+			//For example you can use a flickr rss feed as the URL
+			
 			var $slidesWrapper=$('div',$domObject).eq(0);
 			var $prevControl=$domObject.children().eq(1);
 			var $nextControl=$domObject.children().eq(2);
@@ -83,7 +107,7 @@ Features 	: 	Horizontal Sliding
 			$prevControl.append('<div>'+''+'</div>');
 			$nextControl.append('<div>'+''+'</div>');
 			
-			if(!options.cyclic){
+			if(!options.cycle){
 				$prevControl.hide();
 			}
 			
@@ -109,8 +133,8 @@ Features 	: 	Horizontal Sliding
 				
 
 				//Add custom classes to the slideshow controls
-				$prevControl.addClass('left-slider-control').width(options.slideControlWidth);
-				$nextControl.addClass('right-slider-control').width(options.slideControlWidth);
+				$prevControl.addClass('left-slider-control').width(35);
+				$nextControl.addClass('right-slider-control').width(35);
 				
 				//Calculate the heights of the sliding controls based upon the height of the slides
 				$prevControl.css('top',-(slidesHeight-20));
@@ -153,7 +177,7 @@ Features 	: 	Horizontal Sliding
 			});
 			
 			
-			if(options.cyclic){
+			if(options.cycle){
 			
 				//Save data on the widget during initialization to indicate which controllers should be visible during startup
 				//Initially, the controller for the previous slide should be disabled.
@@ -164,7 +188,7 @@ Features 	: 	Horizontal Sliding
 				//widget._getNextSlide($domObject,options);
 				$prevControl.click(function(){
 					$this=$(this);
-					console.log('cyclic prev');
+					console.log('cycle prev');
 					
 					var $lastSlide=$slidesWrapper.children().eq(maxSlides-1);
 					//console.log($lastSlide.html());
@@ -177,7 +201,7 @@ Features 	: 	Horizontal Sliding
 				});
 				$nextControl.click(function(){
 					$this=$(this);
-					console.log('cyclic next');
+					console.log('cycle next');
 					
 					var $currentSlide=$slidesWrapper.children().eq(0);
 					
@@ -263,8 +287,39 @@ Features 	: 	Horizontal Sliding
 			});
 			}
 			
+		},
+		_getUrlSource:function(){
+			var widget=this;
+			var $domObject=widget.element;
+			var options=this.options;
+			
+			var imgSource='';
+			//console.log("options : " + options.url);
+			console.log('flickr index : ' + options.url.indexOf('flickr'));
+			if(options.url.indexOf('flickr')!=-1){
+				urlSource='flickr';
+				imgSource=options.url+'&format=json&jsoncallback=?'
+			}
+			else{
+				
+			}
+			
+			
+			var dfd = $.Deferred(function(dfd){
+				$.getJSON(imgSource, function(data){
+					$.each(data.items, function(i,item){
+						$("<img/>").attr("src", item.media.m).appendTo($domObject);
+						console.log('fetched');
+					});
+					dfd.resolve();
+				});
+				
+			});
+			
+			return dfd;
+			
 		}
-	
+		
 	};
 
 	$.widget('ui.slideshow',slideshowPrototype);
